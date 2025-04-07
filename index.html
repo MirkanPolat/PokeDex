@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PokeDex</title>
+    <link
+      rel="shortcut icon"
+      href="./assets/img/logo-header.png"
+      type="image/x-icon"
+    />
     <script src="script.js"></script>
-    <link rel="stylesheet" href="./assets/img/standart.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    
-</body>
+    <link rel="stylesheet" href="./assets/img/standart.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body onload="init()">
+    <header>
+      <img src="./assets/img/logo-header.png" alt="" />
+      <input type="text" id="search" placeholder="Search for a Pokémon" />
+      <button id="search-button">Search</button>
+    </header>
+
+    <main id="mainPart">
+        <div id="allPokemons"></div>
+    </main>
+  </body>
 </html>

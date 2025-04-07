@@ -1,0 +1,28 @@
+body {
+  margin: 0;
+}
+header {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+header img {
+  width: 400px;
+  margin: -136px;
+}
+#search{
+    margin-bottom: 14px;
+    
+}
+#search-button{
+    width: 100px;
+}
+main{
+    background-color: #4c4c4c;
+    height: calc(100vh - 220px);
+}
