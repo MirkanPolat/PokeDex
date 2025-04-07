@@ -15,14 +15,29 @@ header img {
   width: 400px;
   margin: -136px;
 }
-#search{
-    margin-bottom: 14px;
-    
+#search {
+  margin-bottom: 14px;
 }
-#search-button{
-    width: 100px;
+#search-button {
+  width: 100px;
 }
-main{
-    background-color: #4c4c4c;
-    height: calc(100vh - 220px);
+main {
+  background-color: #4c4c4c;
+  min-height: calc(100vh - 220px);
+}
+#allPokemons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  padding-top: 22px;
+  gap: 22px;
+}
+.card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 240px;
+  height: 180px;
+  text-align: center;
 }
