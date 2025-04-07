@@ -40,4 +40,8 @@ main {
   width: 240px;
   height: 180px;
   text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 }
