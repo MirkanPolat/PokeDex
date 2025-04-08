@@ -5,7 +5,7 @@ body {
 header {
   background-color: #333;
   color: white;
-  padding: 10px;
+  padding: 21px;
   height: 200px;
   display: flex;
   justify-content: center;
@@ -168,6 +168,13 @@ main {
 }
 .fairy {
   background-color: #ee99ac;
+  border: #333 solid 1px;
+  border-radius: 11px;
+  box-shadow: 0px 0px 20px 0px;
+}
+.electric{
+  background-color: #f8d030;
+  color: black;
   border: #333 solid 1px;
   border-radius: 11px;
   box-shadow: 0px 0px 20px 0px;

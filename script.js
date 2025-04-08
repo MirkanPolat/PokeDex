@@ -48,20 +48,20 @@ function typeTemplate(type) {
 }
 
 function showLoadingSpinner() {
-  document.getElementById("loading").classList.add("active");
+  document.getElementById("loading").classList.add("active"); // zeigt den spinner an
 }
 function removeLoadingSpinner() {
-  document.getElementById("loading").classList.remove("active");
+  document.getElementById("loading").classList.remove("active"); // entfernt den spinner
 }
 
 async function loadMorePokemon() {
   showLoadingSpinner();
 
-  for (let i = currentStartIndex; i < currentStartIndex + 25; i++) {
-    let res = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-    let data = await res.json();
+  for (let i = currentStartIndex; i < currentStartIndex + 25; i++) { // 25 pokemon
+    let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`); 
+    let data = await response.json();
 
-    document.getElementById("allPokemons").innerHTML += renderMyPokemon(data);
+    document.getElementById("allPokemons").innerHTML += renderMyPokemon(data); // pusht die neuen pokemon in den div
 
     for (let j = 0; j < data.types.length; j++) {
       let type = data.types[j];
