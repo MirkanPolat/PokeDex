@@ -18,8 +18,8 @@
   display: flex;
 }
 .loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
+  border: 16px solid #f3f3f3; 
+  border-top: 16px solid #3498db;
   border-radius: 50%;
   width: 120px;
   height: 120px;
@@ -39,10 +39,12 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
+  background-color: #333;
+  height: 86px;
 }
 
 #loadMore {
-  background-color: #ef5350; /* Pokémon-Rot */
+  background-color: #ef5350;
   color: #fff;
   font-weight: bold;
   font-size: 1.2rem;
@@ -52,19 +54,27 @@
   cursor: pointer;
   box-shadow: 0px 4px 0px #b71c1c;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-
 #loadMore:hover {
   background-color: #ff7043;
   transform: translateY(-4px);
   box-shadow: 0px 8px 0px #b71c1c;
 }
 
+/* Pokéball Animation beim Hover */
+#loadMore:hover .btn-pokeball {
+  transform: rotate(360deg);
+}
+
+/* Klick Effekt */
 #loadMore:active {
   transform: translateY(2px);
   box-shadow: 0px 2px 0px #b71c1c;
 }
-/* From Uiverse.io by namecho */ 
+
 button,
 button::after {
  padding: 16px 20px;
@@ -158,4 +168,7 @@ button:hover::after {
   clip-path: var(--slice-1);
   transform: translate(0);
  }
+}
+.buttonImg{
+  display:none;
 }

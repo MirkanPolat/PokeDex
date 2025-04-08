@@ -2,6 +2,7 @@ body {
   margin: 0;
   color: whitesmoke;
 }
+
 header {
   background-color: #333;
   color: white;
@@ -12,20 +13,26 @@ header {
   align-items: center;
   flex-direction: column;
 }
+
 header img {
   width: 400px;
   margin: -136px;
 }
+
 #search {
   margin-bottom: 14px;
 }
+
 #search-button {
   width: 100px;
 }
+
 main {
   background-color: #4c4c4c;
   min-height: calc(100vh - 220px);
+  padding-bottom: 10px;
 }
+
 #allPokemons {
   display: flex;
   flex-wrap: wrap;
@@ -52,6 +59,7 @@ main {
   width: 96px;
   height: 96px;
 }
+
 .type {
   display: inline-block;
   padding: 4px 8px;
@@ -79,13 +87,7 @@ main {
   border-radius: 11px;
   box-shadow: 0px 0px 20px 0px;
 }
-.electric {
-  background-color: #f8d030;
-  color: black;
-  border: #333 solid 1px;
-  border-radius: 11px;
-  box-shadow: 0px 0px 20px 0px;
-}
+
 .poison {
   background-color: #a040a0;
   border: #333 solid 1px;

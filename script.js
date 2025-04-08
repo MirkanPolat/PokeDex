@@ -57,7 +57,15 @@ function removeLoadingSpinner() {
 async function loadMorePokemon() {
   showLoadingSpinner();
 
-  for (let i = currentStartIndex; i < currentStartIndex + 25; i++) { // 25 pokemon
+  if(currentStartIndex > 154) { // 154 ist die max anzahl an pokemon
+    document.getElementById("loadMore").style.display = "none"; // versteckt den button
+    addingButtonImg();
+    alert("No more Pokemon to load");
+    removeLoadingSpinner();
+    return;
+  }
+
+  for (let i = currentStartIndex; i < currentStartIndex + 25 && i <= 154; i++) { // 25 pokemon
     let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`); 
     let data = await response.json();
 
@@ -69,7 +77,10 @@ async function loadMorePokemon() {
         typeTemplate(type);
     }
   }
-
   currentStartIndex += 25;
   removeLoadingSpinner();
+}
+
+function addingButtonImg(){
+  document.getElementById("hideImg").classList.toggle("buttonImg");
 }
