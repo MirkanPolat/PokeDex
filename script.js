@@ -1,6 +1,7 @@
 let currentStartIndex = 25; // ohne, würde ich immer bei 1 starten
 
 function init() {
+  liveSearch(); // ruft die live search funktion auf
   showLoadingSpinner(); // zeigt den spinner an
   getPokemonData(); // lädt die ersten 25 pokemon
 }
@@ -13,7 +14,7 @@ async function getPokemonData() {
     let pokemon = await response.json();
     console.log(pokemon); // gibt die pokemon objekte in der konsole aus
     
-    pokemonContent.innerHTML += renderMyPokemon(pokemon);
+    pokemonContent.innerHTML += renderMyPokemonTemplate(pokemon);
 
     for (let j = 0; j < pokemon.types.length; j++) {// für jeden Typen
       let element = pokemon.types[j];
@@ -24,7 +25,7 @@ async function getPokemonData() {
   removeLoadingSpinner();
 }
 
-function renderMyPokemon(pokemon) {
+function renderMyPokemonTemplate(pokemon) {
   let mainType = pokemon.types[0].type.name; // holt sich den ersten typen und namen (zb grass)
 
   return /*html*/ `
@@ -51,6 +52,7 @@ function typeTemplate(type) {
 function showLoadingSpinner() {
   document.getElementById("loading").classList.add("active"); // zeigt den spinner an
 }
+
 function removeLoadingSpinner() {
   document.getElementById("loading").classList.remove("active"); // entfernt den spinner
 }
@@ -78,10 +80,29 @@ async function loadMorePokemon() {
         typeTemplate(type);
     }
   }
-  currentStartIndex += 25;
+  currentStartIndex += 25; // erhöht den index um 25
   removeLoadingSpinner();
 }
 
 function addingButtonImg(){
-  document.getElementById("hideImg").classList.toggle("buttonImg");
+  document.getElementById("hideImg").classList.toggle("buttonImg"); // zeigt das bild an
+}
+function searchPokemon() {
+  let searchValue = document.getElementById("search").value.toLowerCase();
+  let cards = document.getElementsByClassName("card");
+
+  for (let i = 0; i < cards.length; i++) {
+    let pokemonName = cards[i].querySelector("p").innerText.toLowerCase();
+
+    if (pokemonName.includes(searchValue)) {
+      cards[i].style.display = "";
+    } else {
+      cards[i].style.display = "none";
+    }
+  }
+}
+
+function liveSearch() {
+  let input = document.getElementById("search");
+  input.addEventListener("keyup", searchPokemon); // ruft die searchpokemon Funktion auf, wenn der user etwas eingibt
 }
