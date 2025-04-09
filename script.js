@@ -1,9 +1,12 @@
 let currentStartIndex = 25; // ohne, würde ich immer bei 1 starten
+let pokemons= []; // leeres array für alle pokemon
+let allPokemonList = []; // leeres array für alle pokemon
 
 function init() {
   liveSearch(); // ruft die live search funktion auf
   showLoadingSpinner(); // zeigt den spinner an
   getPokemonData(); // lädt die ersten 25 pokemon
+  loadAllPokemonList(); // lädt alle Namen + URLs 
 }
 
 async function getPokemonData() {
@@ -12,6 +15,8 @@ async function getPokemonData() {
     let url = `https://pokeapi.co/api/v2/pokemon/${i}`; // Pokemon 1,2,3...
     let response = await fetch(url);
     let pokemon = await response.json();
+    pokemons.push(pokemon); // pusht jedes einzelne Pokémon in das Array
+
     console.log(pokemon); // gibt die pokemon objekte in der konsole aus
     
     pokemonContent.innerHTML += renderMyPokemonTemplate(pokemon);
@@ -71,6 +76,7 @@ async function loadMorePokemon() {
   for (let i = currentStartIndex; i < currentStartIndex + 25 && i <= 154; i++) { // 25 pokemon
     let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`); 
     let data = await response.json();
+    pokemons.push(data); // pusht die pokemon in das array
 
     document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(data); // pusht die neuen pokemon in den div
 
@@ -87,23 +93,52 @@ async function loadMorePokemon() {
 function addingButtonImg(){
   document.getElementById("hideImg").classList.toggle("buttonImg"); // zeigt das bild an
 }
-function searchPokemon() { // sucht nach dem pokemon
-  let input = document.getElementById("search").value.toLowerCase(); // holt sich den wert vom input
-  let pokemonCards = document.querySelectorAll(".card"); // holt sich alle pokemon cards
+async function searchPokemon() {
+  let search = document.getElementById("search").value.toLowerCase();
+  let found = false;
 
-  pokemonCards.forEach((card) => { // für jede card
-    let name = card.querySelector("p").innerText.toLowerCase(); // holt sich den namen der card
-    if (name.includes(input)) { // wenn der name den input enthält
-      card.style.display = "block"; // zeigt die card an
-    } else {
-      card.style.display = "none"; // versteckt die card
-    }
+  // 1. Suche in angezeigten Karten
+  document.querySelectorAll(".card").forEach(card => {
+    let name = card.querySelector("p").innerText.toLowerCase();
+    let match = name.includes(search);
+    card.style.display = match ? "block" : "none";
+    if (match) found = true;
   });
+
+  // 2. Wenn kein Treffer & etwas eingegeben → dann nachladen
+  if (!found && search) {
+    let foundPokemon = allPokemonList.find(p => p.name.includes(search));
+    if (!foundPokemon) return alert("Pokémon nicht gefunden");
+
+    let res = await fetch(foundPokemon.url);
+    let pokemon = await res.json();
+
+    if (!document.getElementById(`types${pokemon.id}`)) {
+      pokemons.push(pokemon);
+      document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(pokemon);
+
+      pokemon.types.forEach(t => {
+        document.getElementById(`types${pokemon.id}`).innerHTML += typeTemplate(t);
+      });
+    }
+
+    // 3. Zeige nur das neue Pokémon
+    document.querySelectorAll(".card").forEach(card => {
+      let name = card.querySelector("p").innerText.toLowerCase();
+      card.style.display = name.includes(search) ? "block" : "none";
+    });
+  }
 }
 
 function liveSearch(){ 
-  document.getElementById("search").addEventListener("input", function() {
-    searchPokemon();
-  });
+   // addEventListener schaut ob der input verändert wird // input ist der wert aus dem input
+  // und wenn ja, dann wird die searchPokemon funktion aufgerufen
+  document.getElementById("search").addEventListener("input", searchPokemon)
+}
+
+async function loadAllPokemonList() {
+  let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
+  let data = await response.json();
+  allPokemonList = data.results; // speichert name + url
 }
 
