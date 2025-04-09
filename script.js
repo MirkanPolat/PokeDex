@@ -72,7 +72,7 @@ async function loadMorePokemon() {
     let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`); 
     let data = await response.json();
 
-    document.getElementById("allPokemons").innerHTML += renderMyPokemon(data); // pusht die neuen pokemon in den div
+    document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(data); // pusht die neuen pokemon in den div
 
     for (let j = 0; j < data.types.length; j++) {
       let type = data.types[j];
@@ -87,22 +87,23 @@ async function loadMorePokemon() {
 function addingButtonImg(){
   document.getElementById("hideImg").classList.toggle("buttonImg"); // zeigt das bild an
 }
-function searchPokemon() {
-  let searchValue = document.getElementById("search").value.toLowerCase();
-  let cards = document.getElementsByClassName("card");
+function searchPokemon() { // sucht nach dem pokemon
+  let input = document.getElementById("search").value.toLowerCase(); // holt sich den wert vom input
+  let pokemonCards = document.querySelectorAll(".card"); // holt sich alle pokemon cards
 
-  for (let i = 0; i < cards.length; i++) {
-    let pokemonName = cards[i].querySelector("p").innerText.toLowerCase();
-
-    if (pokemonName.includes(searchValue)) {
-      cards[i].style.display = "";
+  pokemonCards.forEach((card) => { // für jede card
+    let name = card.querySelector("p").innerText.toLowerCase(); // holt sich den namen der card
+    if (name.includes(input)) { // wenn der name den input enthält
+      card.style.display = "block"; // zeigt die card an
     } else {
-      cards[i].style.display = "none";
+      card.style.display = "none"; // versteckt die card
     }
-  }
+  });
 }
 
-function liveSearch() {
-  let input = document.getElementById("search");
-  input.addEventListener("keyup", searchPokemon); // ruft die searchpokemon Funktion auf, wenn der user etwas eingibt
+function liveSearch(){ 
+  document.getElementById("search").addEventListener("input", function() {
+    searchPokemon();
+  });
 }
+
