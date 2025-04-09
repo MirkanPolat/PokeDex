@@ -60,7 +60,7 @@ async function loadMorePokemon() {
   if(currentStartIndex > 154) { // 154 ist die max anzahl an pokemon
     document.getElementById("loadMore").style.display = "none"; // versteckt den button
     addingButtonImg();
-    alert("No more Pokemon to load");
+    alert("No more Pokemon to load"); 
     removeLoadingSpinner();
     return;
   }

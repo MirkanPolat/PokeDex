@@ -21,25 +21,36 @@
         class="spinner-pokeball rotate"
       />
     </div>
-    
+
     <header>
       <img src="./assets/img/logo-header.png" alt="" />
       <input type="text" id="search" placeholder="Search for a Pokémon" />
-      <button id="search-button">Search</button>
+      <button class="btn-style glitchBtn" id="search-button">Search</button>
     </header>
     <main id="mainPart">
       <div id="allPokemons"></div>
     </main>
     <div class="loadMore">
-      <button onclick="loadMorePokemon()" id="loadMore">
-        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" class="btn-pokeball left">
+      <button class="btn-style glitchBtn" onclick="loadMorePokemon()" id="loadMore">
+        <img
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+          class="btn-pokeball left"
+        />
         Load More
-        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" class="btn-pokeball right">
+        <img
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+          class="btn-pokeball right"
+        />
       </button>
       <div>
-        <img id="hideImg" class="buttonImg" src="./assets/img/logo-header.png" width="122px" alt="">
+        <img
+          id="hideImg"
+          class="buttonImg"
+          src="./assets/img/logo-header.png"
+          width="122px"
+          alt=""
+        />
       </div>
     </div>
-    
   </body>
 </html>
