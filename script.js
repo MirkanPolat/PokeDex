@@ -1,8 +1,8 @@
 let currentStartIndex = 25; // ohne, würde ich immer bei 1 starten
 
 function init() {
-  showLoadingSpinner();
-  getPokemonData();
+  showLoadingSpinner(); // zeigt den spinner an
+  getPokemonData(); // lädt die ersten 25 pokemon
 }
 
 async function getPokemonData() {
@@ -11,11 +11,13 @@ async function getPokemonData() {
     let url = `https://pokeapi.co/api/v2/pokemon/${i}`; // Pokemon 1,2,3...
     let response = await fetch(url);
     let pokemon = await response.json();
+    console.log(pokemon); // gibt die pokemon objekte in der konsole aus
+    
     pokemonContent.innerHTML += renderMyPokemon(pokemon);
 
     for (let j = 0; j < pokemon.types.length; j++) {// für jeden Typen
       let element = pokemon.types[j];
-      let allTypes = document.getElementById(`types${pokemon.id}`);
+      let allTypes = document.getElementById(`types${pokemon.id}`); // id vom pokemon
       allTypes.innerHTML += typeTemplate(element);
     }
   }
@@ -30,10 +32,9 @@ function renderMyPokemon(pokemon) {
           <div class="card_content">
               <p>Name: ${pokemon.name.toUpperCase()}</p>
               <p># ${pokemon.id}</p>
-              <p id="types${pokemon.id}">Type: </p>
-              <img src="https://play.pokemonshowdown.com/sprites/ani/${
-                pokemon.name
-              }.gif">
+              <p id="types${pokemon.id}">Type: </p> 
+              <img src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif"
+              alt="${pokemon.name}" onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
           </div>
       </div>
     `;
