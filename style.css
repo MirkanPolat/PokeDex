@@ -172,3 +172,20 @@ button:hover::after {
 .buttonImg{
   display:none;
 }
+.spinner-pokeball {
+  width: 100px;
+  height: 100px;
+}
+
+.rotate {
+  animation: rotatePokeball 1s linear infinite;
+}
+
+@keyframes rotatePokeball {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
