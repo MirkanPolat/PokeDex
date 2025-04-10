@@ -31,10 +31,9 @@ async function getPokemonData() {
 }
 
 function renderMyPokemonTemplate(pokemon) {
-  let mainType = pokemon.types[0].type.name; // holt sich den ersten typen und namen (zb grass)
-
+  let mainType = pokemon.types[0].type.name;
   return /*html*/ `
-      <div class="card ${mainType}"> <!-- übernimmt diie gleichen eigenschaften wie vom 0 type -->
+      <div class="card ${mainType}" data-name="${pokemon.name}">
           <div class="card_content">
               <p>Name: ${pokemon.name.toUpperCase()}</p>
               <p># ${pokemon.id}</p>
@@ -45,6 +44,7 @@ function renderMyPokemonTemplate(pokemon) {
       </div>
     `;
 }
+
 
 function typeTemplate(type) {
   // in dem type.type.name steht zb grass, fire, water
@@ -94,38 +94,52 @@ function addingButtonImg(){
   document.getElementById("hideImg").classList.toggle("buttonImg"); // zeigt das bild an
 }
 async function searchPokemon() {
-  let search = document.getElementById("search").value.toLowerCase();
-  let found = false;
+  const searchText = document.getElementById("search").value.toLowerCase();
 
-  // 1. Suche in angezeigten Karten
+  // Alle Karten ausblenden
   document.querySelectorAll(".card").forEach(card => {
-    let name = card.querySelector("p").innerText.toLowerCase();
-    let match = name.includes(search);
-    card.style.display = match ? "block" : "none";
-    if (match) found = true;
+    card.style.display = "none";
   });
 
-  // 2. Wenn kein Treffer & etwas eingegeben → dann nachladen
-  if (!found && search) {
-    let foundPokemon = allPokemonList.find(p => p.name.includes(search));
-    if (!foundPokemon) return alert("Pokémon nicht gefunden");
-
-    let res = await fetch(foundPokemon.url);
-    let pokemon = await res.json();
-
-    if (!document.getElementById(`types${pokemon.id}`)) {
-      pokemons.push(pokemon);
-      document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(pokemon);
-
-      pokemon.types.forEach(t => {
-        document.getElementById(`types${pokemon.id}`).innerHTML += typeTemplate(t);
-      });
+  // Zuerst: Zeige alle bereits geladenen Karten, die zum Suchbegriff passen
+  let visibleFound = false;
+  document.querySelectorAll(".card").forEach(card => {
+    const nameText = card.getAttribute("data-name").toLowerCase();
+    if (nameText.includes(searchText)) {
+      card.style.display = "block";
+      visibleFound = true;
     }
+  });
 
-    // 3. Zeige nur das neue Pokémon
+  // Falls noch keine Karten sichtbar sind und etwas gesucht wurde, suche in allPokemonList
+  if (!visibleFound && searchText) {
+    const matchingPokemons = allPokemonList.filter(p => p.name.includes(searchText));
+    if (matchingPokemons.length === 0) {
+      return alert("Pokémon nicht gefunden");
+    }
+    // Lade für jedes gefundene Pokémon die Daten und füge eine Karte hinzu, falls sie noch nicht geladen ist
+    for (let p of matchingPokemons) {
+      if (!document.querySelector(`.card[data-name="${p.name}"]`)) {
+        const res = await fetch(p.url);
+        const pokemon = await res.json();
+        pokemons.push(pokemon);
+        document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(pokemon);
+        pokemon.types.forEach(t => {
+          document.getElementById(`types${pokemon.id}`).innerHTML += typeTemplate(t);
+        });
+      }
+    }
+    // Zeige nur die Karten, die dem Suchbegriff entsprechen
     document.querySelectorAll(".card").forEach(card => {
-      let name = card.querySelector("p").innerText.toLowerCase();
-      card.style.display = name.includes(search) ? "block" : "none";
+      const nameText = card.getAttribute("data-name").toLowerCase();
+      card.style.display = nameText.includes(searchText) ? "block" : "none";
+    });
+  }
+
+  // Wenn das Suchfeld leer ist, zeige alle Karten an
+  if (!searchText) {
+    document.querySelectorAll(".card").forEach(card => {
+      card.style.display = "block";
     });
   }
 }
@@ -141,4 +155,12 @@ async function loadAllPokemonList() {
   let data = await response.json();
   allPokemonList = data.results; // speichert name + url
 }
+
+
+
+
+
+
+
+
 
