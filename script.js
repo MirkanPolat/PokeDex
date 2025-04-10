@@ -1,5 +1,5 @@
-let currentStartIndex = 25; // ohne, würde ich immer bei 1 starten
-let pokemons= []; // leeres array für alle pokemon
+let currentStartIndex = 26; // Gibt an, ab welchem Pokémon die nächsten 25 geladen werden sollen.
+let pokemons= []; // speichert alle pokemons aus der api
 let allPokemonList = []; // leeres array für alle pokemon
 
 function init() {
@@ -16,9 +16,6 @@ async function getPokemonData() {
     let response = await fetch(url);
     let pokemon = await response.json();
     pokemons.push(pokemon); // pusht jedes einzelne Pokémon in das Array
-
-    console.log(pokemon); // gibt die pokemon objekte in der konsole aus
-    
     pokemonContent.innerHTML += renderMyPokemonTemplate(pokemon);
 
     for (let j = 0; j < pokemon.types.length; j++) {// für jeden Typen
@@ -30,21 +27,21 @@ async function getPokemonData() {
   removeLoadingSpinner();
 }
 
-function renderMyPokemonTemplate(pokemon) {
-  let mainType = pokemon.types[0].type.name;
-  return /*html*/ `
-      <div class="card ${mainType}" data-name="${pokemon.name}">
-          <div class="card_content">
-              <p>Name: ${pokemon.name.toUpperCase()}</p>
-              <p># ${pokemon.id}</p>
-              <p id="types${pokemon.id}">Type: </p> 
-              <img src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif"
-              alt="${pokemon.name}" onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
-          </div>
+function renderMyPokemonTemplate(pokemon, source = "loaded") { // Wenn kein zweiter Wert mitgegeben wird, ist die Quelle "loaded" (normal geladen, nicht durch Suche)
+  let mainType = pokemon.types[0].type.name; // nimmt den ersten Typen zb grass 
+  return /*html*/`
+    <div class="card ${mainType}" data-name="${pokemon.name.toLowerCase()}" data-id="${pokemon.id}" data-source="${source}"> <!--speichert den Namen und die ID des Pokémon-->
+      <div class="card_content">
+        <p>Name: ${pokemon.name.toUpperCase()}</p>
+        <p># ${pokemon.id}</p>
+        <p id="types${pokemon.id}">Type: </p>
+        <img src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif"
+             alt="${pokemon.name}"
+             onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
       </div>
-    `;
+    </div>
+  `;
 }
-
 
 function typeTemplate(type) {
   // in dem type.type.name steht zb grass, fire, water
@@ -62,18 +59,21 @@ function removeLoadingSpinner() {
   document.getElementById("loading").classList.remove("active"); // entfernt den spinner
 }
 
+function addingButtonImg(){
+  document.getElementById("hideImg").classList.toggle("buttonImg"); // zeigt das bild an
+}
+
 async function loadMorePokemon() {
   showLoadingSpinner();
 
-  if(currentStartIndex > 154) { // 154 ist die max anzahl an pokemon
+  if(currentStartIndex > 1025) { // 1025 ist die max anzahl an pokemon
     document.getElementById("loadMore").style.display = "none"; // versteckt den button
     addingButtonImg();
     alert("No more Pokemon to load"); 
     removeLoadingSpinner();
     return;
-  }
-
-  for (let i = currentStartIndex; i < currentStartIndex + 25 && i <= 154; i++) { // 25 pokemon
+  } 
+  for (let i = currentStartIndex; i < currentStartIndex + 25 && i <= 1025; i++) { // lädt die nächsten 25 pokemon 
     let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`); 
     let data = await response.json();
     pokemons.push(data); // pusht die pokemon in das array
@@ -90,27 +90,43 @@ async function loadMorePokemon() {
   removeLoadingSpinner();
 }
 
-function addingButtonImg(){
-  document.getElementById("hideImg").classList.toggle("buttonImg"); // zeigt das bild an
-}
-async function searchPokemon() {
-  const s = document.getElementById("search").value.toLowerCase().trim();
-  if (!s) { document.querySelectorAll(".card").forEach(c => c.style.display = "block"); return; }
-  let found = false;
-  document.querySelectorAll(".card").forEach(c => { 
-    if (c.dataset.name.toLowerCase().includes(s)) { c.style.display = "block"; found = true; }
-    else { c.style.display = "none"; } 
-  });
-  if (found) return;
-  const matches = allPokemonList.filter(p => p.name.toLowerCase().includes(s));
-  if (matches.length === 0) { alert("Pokémon nicht gefunden"); return; }
-  for (const p of matches) if (!document.querySelector(`.card[data-name="${p.name}"]`)) {
-    try { const res = await fetch(p.url); const poke = await res.json(); pokemons.push(poke); document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(poke); poke.types.forEach(t => document.getElementById(`types${poke.id}`).innerHTML += typeTemplate(t)); }
-    catch (e) { console.error("Fehler beim Laden von " + p.name, e); }
+async function searchPokemon(){
+  let search = document.getElementById("search").value.toLowerCase().trim(); // nimmt den wert aus dem input und wandelt ihn in kleinbuchstaben um
+  if(!search){ // wenn der input leer ist
+    document.querySelectorAll('.card[data-source="search"]').forEach(c => c.remove()); // entfernt die pokemon die durch die suche geladen wurden, data source ist eine art von filter 
+    document.querySelectorAll('.card[data-source="loaded"]').forEach(c => c.style.display = "block"); // zeigt die pokemon wieder an die geladen wurden, data source loaded sind die geladenen pokemon
+    return;
   }
-  document.querySelectorAll(".card").forEach(c => c.style.display = c.dataset.name.toLowerCase().includes(s) ? "block" : "none");
+  // hier wird die suche gemacht
+  let found = false; 
+  document.querySelectorAll('.card[data-source="loaded"]').forEach(c => { // geht alle pokemon durch die geladen wurden
+    let match = c.dataset.name.includes(search) || c.dataset.id.includes(search); // prüft ob der name oder die id des pokemon mit dem input übereinstimmt
+    c.style.display = match ? "block" : "none"; // wenn es übereinstimmt, wird das pokemon angezeigt, sonst versteckt
+    if(match) found = true; // wenn es übereinstimmt, wird found auf true gesetzt
+  }); 
+  // wenn nichts passendes gefunden wurde, wird die suche fortgesetzt
+  if(!found){ // wenns false ist
+    let matches = allPokemonList.filter(p => { // hier werden Pokemon gefiltert p ist jedes pokemon
+      let id = p.url.split("/").filter(Boolean).pop(); // split zerlegt es in teile filter boolean entfernt leere teile und pop gibt den letzten wert zurück
+      return p.name.toLowerCase().includes(search) || id.includes(search); // prüft ob der name oder die id mit dem input übereinstimmt
+    });
+    // wenn nichts gefunden wurde 
+    if(!matches.length){ alert("Pokémon nicht gefunden"); return; } 
+    // wenn was gefunden wurde
+    for(let p of matches) // p ist ein gefiltertes pokemon matches ist das array mit den gefilterten pokemon
+      if(!document.querySelector(`.card[data-name="${p.name.toLowerCase()}"]`)){ // wenn es noch nicht in der liste ist, dann 
+         try {
+           let res = await fetch(p.url), poke = await res.json(); // hier wird das pokemon geladen und gefetcht
+           pokemons.push(poke); 
+           document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(poke,"search"); // fügt das pokemon in die liste ein, Search ist die Quelle
+           poke.types.forEach(t => document.getElementById(`types${poke.id}`).innerHTML += typeTemplate(t)); // fügt die typen in die liste ein
+         } catch(e) { console.error(e); } // gibt den fehler aus
+      }
+  }
+  document.querySelectorAll('.card[data-source="search"]').forEach(c => { // geht die gesuchten pokemon durch
+    c.style.display = c.dataset.name.includes(search) || c.dataset.id.includes(search) ? "block" : "none"; // zeigt sie an oder versteckt sie wenn sie nicht übereinstimmen
+  });
 }
-
 
 function liveSearch(){ 
    // addEventListener schaut ob der input verändert wird // input ist der wert aus dem input
@@ -123,12 +139,4 @@ async function loadAllPokemonList() {
   let data = await response.json();
   allPokemonList = data.results; // speichert name + url
 }
-
-
-
-
-
-
-
-
 
