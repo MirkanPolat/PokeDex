@@ -30,7 +30,7 @@ async function getPokemonData() {
 function renderMyPokemonTemplate(pokemon, source = "loaded") { // Wenn kein zweiter Wert mitgegeben wird, ist die Quelle "loaded" (normal geladen, nicht durch Suche)
   let mainType = pokemon.types[0].type.name; // nimmt den ersten Typen zb grass 
   return /*html*/`
-    <div class="card ${mainType}" data-name="${pokemon.name.toLowerCase()}" data-id="${pokemon.id}" data-source="${source}"> <!--speichert den Namen und die ID des Pokémon-->
+    <div onclick="detailPokemonOverlay(${pokemon.id}); toggleDetailPokemon();" class="card ${mainType}" data-name="${pokemon.name.toLowerCase()}" data-id="${pokemon.id}" data-source="${source}"> <!--speichert den Namen und die ID des Pokémon-->
       <div class="card_content">
         <p>Name: ${pokemon.name.toUpperCase()}</p>
         <p># ${pokemon.id}</p>
@@ -140,3 +140,31 @@ async function loadAllPokemonList() {
   allPokemonList = data.results; // speichert name + url
 }
 
+function toggleDetailPokemon() {
+  document.getElementById("detailPokemon").classList.toggle("hidden");
+}
+
+function detailPokemonOverlay(pokemonId) {
+  let detailPokemonElement = document.getElementById("detailPokemon");
+  detailPokemonElement.innerHTML = ""; 
+  detailPokemonElement.innerHTML += renderDetailPokemonTemplate(pokemonId); // hier wird das pokemon geladen
+}
+
+function renderDetailPokemonTemplate(pokemonId) {
+  let pokemon = pokemons.find(p => p.id == pokemonId);
+  if (!pokemon) { 
+    return `<div class="OverlaydetailDiv">Pokémon nicht gefunden.</div>`;
+  }
+  let mainType = pokemon.types[0].type.name;
+  return /*html*/`
+  <div class="OverlaydetailDiv ${mainType}" onclick="event.stopPropagation()">
+    <h2>${pokemon.name.toUpperCase()}</h2>
+    <p># ${pokemon.id}</p>
+    <p id="detailTypes${pokemon.id}">Type: ${pokemon.types.map(t => t.type.name).join(", ")}</p>
+    <img src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif"
+             alt="${pokemon.name}"
+             onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
+    <button onclick="toggleDetailPokemon()">Schließen</button>
+  </div>
+  `;
+}
