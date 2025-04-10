@@ -94,55 +94,23 @@ function addingButtonImg(){
   document.getElementById("hideImg").classList.toggle("buttonImg"); // zeigt das bild an
 }
 async function searchPokemon() {
-  const searchText = document.getElementById("search").value.toLowerCase();
-
-  // Alle Karten ausblenden
-  document.querySelectorAll(".card").forEach(card => {
-    card.style.display = "none";
+  const s = document.getElementById("search").value.toLowerCase().trim();
+  if (!s) { document.querySelectorAll(".card").forEach(c => c.style.display = "block"); return; }
+  let found = false;
+  document.querySelectorAll(".card").forEach(c => { 
+    if (c.dataset.name.toLowerCase().includes(s)) { c.style.display = "block"; found = true; }
+    else { c.style.display = "none"; } 
   });
-
-  // Zuerst: Zeige alle bereits geladenen Karten, die zum Suchbegriff passen
-  let visibleFound = false;
-  document.querySelectorAll(".card").forEach(card => {
-    const nameText = card.getAttribute("data-name").toLowerCase();
-    if (nameText.includes(searchText)) {
-      card.style.display = "block";
-      visibleFound = true;
-    }
-  });
-
-  // Falls noch keine Karten sichtbar sind und etwas gesucht wurde, suche in allPokemonList
-  if (!visibleFound && searchText) {
-    const matchingPokemons = allPokemonList.filter(p => p.name.includes(searchText));
-    if (matchingPokemons.length === 0) {
-      return alert("Pokémon nicht gefunden");
-    }
-    // Lade für jedes gefundene Pokémon die Daten und füge eine Karte hinzu, falls sie noch nicht geladen ist
-    for (let p of matchingPokemons) {
-      if (!document.querySelector(`.card[data-name="${p.name}"]`)) {
-        const res = await fetch(p.url);
-        const pokemon = await res.json();
-        pokemons.push(pokemon);
-        document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(pokemon);
-        pokemon.types.forEach(t => {
-          document.getElementById(`types${pokemon.id}`).innerHTML += typeTemplate(t);
-        });
-      }
-    }
-    // Zeige nur die Karten, die dem Suchbegriff entsprechen
-    document.querySelectorAll(".card").forEach(card => {
-      const nameText = card.getAttribute("data-name").toLowerCase();
-      card.style.display = nameText.includes(searchText) ? "block" : "none";
-    });
+  if (found) return;
+  const matches = allPokemonList.filter(p => p.name.toLowerCase().includes(s));
+  if (matches.length === 0) { alert("Pokémon nicht gefunden"); return; }
+  for (const p of matches) if (!document.querySelector(`.card[data-name="${p.name}"]`)) {
+    try { const res = await fetch(p.url); const poke = await res.json(); pokemons.push(poke); document.getElementById("allPokemons").innerHTML += renderMyPokemonTemplate(poke); poke.types.forEach(t => document.getElementById(`types${poke.id}`).innerHTML += typeTemplate(t)); }
+    catch (e) { console.error("Fehler beim Laden von " + p.name, e); }
   }
-
-  // Wenn das Suchfeld leer ist, zeige alle Karten an
-  if (!searchText) {
-    document.querySelectorAll(".card").forEach(card => {
-      card.style.display = "block";
-    });
-  }
+  document.querySelectorAll(".card").forEach(c => c.style.display = c.dataset.name.toLowerCase().includes(s) ? "block" : "none");
 }
+
 
 function liveSearch(){ 
    // addEventListener schaut ob der input verändert wird // input ist der wert aus dem input
