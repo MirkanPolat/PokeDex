@@ -228,10 +228,14 @@ main {
 /* Farbiger Kopfbereich – wir könnten hier den Typ-Farbverlauf verwenden */
 .overlayHeader {
   padding: 16px;
-  background: #ff7043; /* oder #ef5350 oder irgendeine background: var(--mainTypeColor) */
   color: #fff;
   text-align: center;
   border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+h2{
+  display: flex;
+  justify-content: space-between;
 }
 
 /* Pokémon-Bild */
@@ -291,4 +295,8 @@ main {
 .overlayTabContent {
   padding: 0 16px 40px; /* Platz unten, damit der Schließen-Button nicht verdeckt */
   color: #333;
+}
+.pokeImageContainer{
+  height: 210px;
+  padding: 10px;
 }

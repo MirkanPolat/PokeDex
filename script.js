@@ -32,8 +32,8 @@ function renderMyPokemonTemplate(pokemon, source = "loaded") { // Wenn kein zwei
   return /*html*/`
     <div onclick="detailPokemonOverlay(${pokemon.id}) " class="card ${mainType}" data-name="${pokemon.name.toLowerCase()}" data-id="${pokemon.id}" data-source="${source}"> <!--speichert den Namen und die ID des Pokémon-->
       <div class="card_content">
-        <p>Name: ${pokemon.name.toUpperCase()}</p>
-        <p># ${pokemon.id}</p>
+        <p>${pokemon.name.toUpperCase()}</p>
+        <p>No. ${pokemon.id}</p>
         <p id="types${pokemon.id}">Type: </p>
         <img src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif"
              alt="${pokemon.name}"
@@ -139,7 +139,7 @@ async function loadAllPokemonList() {
   let data = await response.json();
   allPokemonList = data.results; // speichert name + url
 }
-
+// klick ins leere schließt alles
 function toggleDetailPokemon() {
   document.getElementById("detailPokemon").classList.toggle("hidden");
 }
@@ -154,9 +154,9 @@ function detailPokemonOverlay(pokemonId) {
 }
 
 function renderFancyDetailTemplate(pokemonId) {
-  let pokemon = pokemons.find(p => p.id == pokemonId);
-  if (!pokemon) {
-    return `<div class="overlayInner">Pokémon mit ID ${pokemonId} nicht gefunden.</div>`;
+  let pokemon = pokemons.find(p => p.id == pokemonId); // gibt das pokemon mit der id zurück
+  if (!pokemon) { // wenn das pokemon nicht gefunden wurde
+    return `<div class="overlayInner">Pokémon mit ID ${pokemonId} nicht gefunden.</div>`; // gibt eine fehlermeldung aus
   }
 
   // z.B. Hintergrundfarbe basierend auf dem Haupt-Typ
@@ -165,8 +165,8 @@ function renderFancyDetailTemplate(pokemonId) {
   // Beispiel-Werte – in der finalen Version holst du dir Stats, Größe, Gewicht etc. aus dem Pokemon-Objekt
   let name = pokemon.name.toUpperCase();
   let pokeID = pokemon.id;
-  let height = (pokemon.height / 10) + " m";      // Die API liefert die Höhe oft in Dezimetern
-  let weight = (pokemon.weight / 10) + " kg";     // Die API liefert das Gewicht oft in Dekagramm
+  let height = (pokemon.height / 10) + " m";      // Die API liefert die Größe in Dezimeter
+  let weight = (pokemon.weight / 10) + " kg";     // Die API liefert das Gewicht in Hektogramm
   let abilities = pokemon.abilities.map(a => a.ability.name).join(", ");
 
   // Optionale Felder – du könntest hier echte Base Stats (pokemon.stats[]) eintragen
@@ -176,14 +176,16 @@ function renderFancyDetailTemplate(pokemonId) {
   // Du kannst die Tabs per JS ein-/ausblenden. Hier zeige ich nur ein Beispiel.
   return /*html*/ `
     <div class="overlayInner ${mainType}">
-      <div class="overlayHeader">
-        <h2>${name} <span class="idTag">#${pokeID}</span></h2>
+      <div class="overlayHeader ${mainType}">
+        <h2>${name} <span class="idTag">No. ${pokeID}</span></h2>
         <div class="typeRow">
           ${pokemon.types.map(t => `<span class="type ${t.type.name}">${t.type.name}</span>`).join(" ")}
         </div>
-        <img class="pokeImage" src="${pokemon.sprites.other['official-artwork'].front_default}" 
-             alt="${name}" 
-             onerror="this.onerror=null; this.src='${pokemon.sprites.front_default}'">
+        <div class="pokeImageContainer">
+        <img src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif" width="200" height="200"
+     alt="${pokemon.name}"
+     onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
+    </div>
       </div>
 
       <div class="overlayTabs">
