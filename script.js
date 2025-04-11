@@ -30,7 +30,7 @@ async function getPokemonData() {
 function renderMyPokemonTemplate(pokemon, source = "loaded") { // Wenn kein zweiter Wert mitgegeben wird, ist die Quelle "loaded" (normal geladen, nicht durch Suche)
   let mainType = pokemon.types[0].type.name; // nimmt den ersten Typen zb grass 
   return /*html*/`
-    <div onclick="detailPokemonOverlay(${pokemon.id}); toggleDetailPokemon();" class="card ${mainType}" data-name="${pokemon.name.toLowerCase()}" data-id="${pokemon.id}" data-source="${source}"> <!--speichert den Namen und die ID des Pokémon-->
+    <div onclick="detailPokemonOverlay(${pokemon.id}) " class="card ${mainType}" data-name="${pokemon.name.toLowerCase()}" data-id="${pokemon.id}" data-source="${source}"> <!--speichert den Namen und die ID des Pokémon-->
       <div class="card_content">
         <p>Name: ${pokemon.name.toUpperCase()}</p>
         <p># ${pokemon.id}</p>
@@ -145,26 +145,86 @@ function toggleDetailPokemon() {
 }
 
 function detailPokemonOverlay(pokemonId) {
-  let detailPokemonElement = document.getElementById("detailPokemon");
-  detailPokemonElement.innerHTML = ""; 
-  detailPokemonElement.innerHTML += renderDetailPokemonTemplate(pokemonId); // hier wird das pokemon geladen
+  // 1. Inhalt in #detailContent schreiben
+  let detailPokemonElement = document.getElementById("detailContent");
+  detailPokemonElement.innerHTML = renderFancyDetailTemplate(pokemonId);
+
+  // 2. Overlay sichtbar machen
+  document.getElementById("detailPokemon").classList.remove("hidden");
 }
 
-function renderDetailPokemonTemplate(pokemonId) {
+function renderFancyDetailTemplate(pokemonId) {
   let pokemon = pokemons.find(p => p.id == pokemonId);
-  if (!pokemon) { 
-    return `<div class="OverlaydetailDiv">Pokémon nicht gefunden.</div>`;
+  if (!pokemon) {
+    return `<div class="overlayInner">Pokémon mit ID ${pokemonId} nicht gefunden.</div>`;
   }
+
+  // z.B. Hintergrundfarbe basierend auf dem Haupt-Typ
   let mainType = pokemon.types[0].type.name;
-  return /*html*/`
-  <div class="OverlaydetailDiv ${mainType}" onclick="event.stopPropagation()">
-    <h2>${pokemon.name.toUpperCase()}</h2>
-    <p># ${pokemon.id}</p>
-    <p id="detailTypes${pokemon.id}">Type: ${pokemon.types.map(t => t.type.name).join(", ")}</p>
-    <img src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif"
-             alt="${pokemon.name}"
-             onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
-    <button onclick="toggleDetailPokemon()">Schließen</button>
-  </div>
+
+  // Beispiel-Werte – in der finalen Version holst du dir Stats, Größe, Gewicht etc. aus dem Pokemon-Objekt
+  let name = pokemon.name.toUpperCase();
+  let pokeID = pokemon.id;
+  let height = (pokemon.height / 10) + " m";      // Die API liefert die Höhe oft in Dezimetern
+  let weight = (pokemon.weight / 10) + " kg";     // Die API liefert das Gewicht oft in Dekagramm
+  let abilities = pokemon.abilities.map(a => a.ability.name).join(", ");
+
+  // Optionale Felder – du könntest hier echte Base Stats (pokemon.stats[]) eintragen
+  let baseStats = pokemon.stats.map(s => `${s.stat.name}: ${s.base_stat}`).join("<br>");
+
+  // Hier das Layout mit Tabs: About | Base Stats | Gender | Shiny
+  // Du kannst die Tabs per JS ein-/ausblenden. Hier zeige ich nur ein Beispiel.
+  return /*html*/ `
+    <div class="overlayInner ${mainType}">
+      <div class="overlayHeader">
+        <h2>${name} <span class="idTag">#${pokeID}</span></h2>
+        <div class="typeRow">
+          ${pokemon.types.map(t => `<span class="type ${t.type.name}">${t.type.name}</span>`).join(" ")}
+        </div>
+        <img class="pokeImage" src="${pokemon.sprites.other['official-artwork'].front_default}" 
+             alt="${name}" 
+             onerror="this.onerror=null; this.src='${pokemon.sprites.front_default}'">
+      </div>
+
+      <div class="overlayTabs">
+        <button onclick="showTab('about')">About</button>
+        <button onclick="showTab('stats')">Base Stats</button>
+        <button onclick="showTab('gender')">Gender</button>
+        <button onclick="showTab('shiny')">Shiny</button>
+      </div>
+
+      <!-- Tab: About -->
+      <div class="overlayTabContent" id="tab-about">
+        <p><b>Species:</b> ${pokemon.name}</p>
+        <p><b>Height:</b> ${height}</p>
+        <p><b>Weight:</b> ${weight}</p>
+        <p><b>Abilities:</b> ${abilities}</p>
+      </div>
+
+      <!-- Tab: Base Stats -->
+      <div class="overlayTabContent" id="tab-stats" style="display:none;">
+        <h3>Base Stats</h3>
+        <p>${baseStats}</p>
+      </div>
+
+      <!-- Tab: Gender (API v2 hat nicht bei jedem Pokémon gender-Daten, nur example) -->
+      <div class="overlayTabContent" id="tab-gender" style="display:none;">
+        <p>Gender-Daten hier, falls vorhanden.</p>
+      </div>
+
+      <!-- Tab: Shiny -->
+      <div class="overlayTabContent" id="tab-shiny" style="display:none;">
+        <img class="pokeImage" src="${pokemon.sprites.front_shiny}" alt="Shiny ${name}">
+      </div>
+
+      <button class="closeBtn" onclick="toggleDetailPokemon()">Schließen</button>
+    </div>
   `;
+}
+
+function showTab(tabName) {
+  // Alle Tabs ausblenden
+  document.querySelectorAll('.overlayTabContent').forEach(tab => tab.style.display = 'none');
+  // Gewählten Tab einblenden
+  document.getElementById(`tab-${tabName}`).style.display = 'block';
 }
