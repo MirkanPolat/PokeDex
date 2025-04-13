@@ -1,0 +1,23 @@
+@media (max-width: 423px) {
+  header img {
+    width: 323px;
+    margin: -108px;
+  }
+  #search {
+    width: 244px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+  #search-btn {
+    width: 50px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+}
+@media (max-width: 400px){
+    .overlayHeader img {
+        width: 85px;
+        height: 85px;
+    }
+}

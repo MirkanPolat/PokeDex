@@ -255,3 +255,25 @@ button:hover::after {
   border-radius: 8px;
   transition: width 0.3s ease;
 }
+
+.shiny-gallery {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.shiny-nav {
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ef5350;
+}
+
+.info-text {
+  color: #ef5350;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 5px;
+}

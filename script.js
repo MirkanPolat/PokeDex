@@ -1,6 +1,8 @@
 let currentStartIndex = 26;
 let pokemons = [];
 let allPokemonList = [];
+let shinySources = [];
+let currentShinyIndex = 0;
 
 function init() {
   liveSearch();
@@ -32,7 +34,7 @@ function renderPokemonCard(pokemon, source = "loaded") {
         <img loading="lazy" src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif" onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
       </div>
     </div>
-  `;
+  `
 }
 
 function renderPokemonTypes(pokemon) {
@@ -80,12 +82,19 @@ function liveSearch() {
 
 async function searchPokemon() {
   let searchInput = document.getElementById("search").value.toLowerCase().trim();
+  let infoBox = document.getElementById("searchInfo");
+  infoBox.textContent = "";
 
   if (!searchInput) {
-    document.querySelectorAll(".card").forEach(card => card.style.display = "block");
+    document.querySelectorAll(".card[data-source='loaded']").forEach(card => card.style.display = "block");
+    document.querySelectorAll(".card[data-source='search']").forEach(card => card.remove());
     return;
   }
 
+  if (searchInput.length < 3) {
+    infoBox.textContent = "Bitte mindestens 3 Buchstaben eingeben.";
+    return;
+  }
   let foundMatch = false;
   document.querySelectorAll(".card").forEach(card => {
     let name = card.dataset.name;
@@ -104,10 +113,11 @@ async function searchPokemon() {
       document.getElementById("allPokemons").innerHTML += renderPokemonCard(pokemonData, "search");
       renderPokemonTypes(pokemonData);
     } else {
-      alert("Pokémon nicht gefunden");
+      infoBox.textContent = "Pokémon nicht gefunden.";
     }
   }
 }
+
 
 async function loadAllPokemonList() {
   let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
@@ -131,15 +141,32 @@ function renderPokemonDetail(pokemon) {
   let abilities = pokemon.abilities.map(a => a.ability.name).join(", ");
 
   let baseStats = pokemon.stats.map(stat => {
-    return `
-      <div class="stat-row">
+    return /*html*/`
+     <div class="stat-row">
         <span class="stat-name">${stat.stat.name}</span>
         <div class="stat-bar">
           <div class="stat-fill ${mainType}" style="width: ${stat.base_stat / 2}%">${stat.base_stat}</div>
         </div>
       </div>
-    `;
+    `
   }).join("");
+
+  shinySources = [
+    pokemon.sprites.front_shiny,
+    pokemon.sprites.back_shiny,
+    pokemon.sprites.front_shiny_female,
+    pokemon.sprites.back_shiny_female
+  ].filter(src => src);
+
+  currentShinyIndex = 0;
+
+  let shinyGallery = shinySources.length > 0 ? `
+    <div class="shiny-gallery">
+      <button class="shiny-nav" onclick="prevShiny()">←</button>
+      <img id="shinyImage" class="pokeImage" src="${shinySources[0]}" alt="Shiny ${pokemon.name}">
+      <button class="shiny-nav" onclick="nextShiny()">→</button>
+    </div>
+  ` : '<p>Keine Shiny-Bilder vorhanden</p>';
 
   return `
     <div class="overlayInner ${mainType}">
@@ -150,7 +177,7 @@ function renderPokemonDetail(pokemon) {
         </div>
         <div class="pokeImageContainer">
           <button class="nav-button left" onclick="navigateToPokemon(${pokemon.id - 1})">←</button>
-          <img loading="lazy" src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif" onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'" width="200" height="200">
+          <img loading="lazy" src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif" onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'" height="140" width="140">
           <button class="nav-button right" onclick="navigateToPokemon(${pokemon.id + 1})">→</button>
         </div>
       </div>
@@ -168,13 +195,12 @@ function renderPokemonDetail(pokemon) {
         ${baseStats}
       </div>
       <div class="overlayTabContent" id="tab-shiny" style="display:none">
-        <img src="${pokemon.sprites.front_shiny}" class="pokeImage" alt="shiny ${pokemon.name}">
+        ${shinyGallery}
       </div>
-      <button class="closeBtn" onclick="toggleDetailOverlay()">Schließen</button>
+      <button class="closeBtn" onclick="toggleDetailOverlay()">Close</button>
     </div>
   `;
 }
-
 
 function showTab(tabName) {
   document.querySelectorAll(".overlayTabContent").forEach(tab => tab.style.display = "none");
@@ -199,4 +225,16 @@ function navigateToPokemon(id) {
       })
       .catch(error => console.error("Navigation fehlgeschlagen", error));
   }
+}
+
+function prevShiny() {
+  if (shinySources.length === 0) return;
+  currentShinyIndex = (currentShinyIndex - 1 + shinySources.length) % shinySources.length;
+  document.getElementById("shinyImage").src = shinySources[currentShinyIndex];
+}
+
+function nextShiny() {
+  if (shinySources.length === 0) return;
+  currentShinyIndex = (currentShinyIndex + 1) % shinySources.length;
+  document.getElementById("shinyImage").src = shinySources[currentShinyIndex];
 }
