@@ -12,6 +12,7 @@
     <script src="script.js"></script>
     <link rel="stylesheet" href="./assets/img/standart.css" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="responsive.css" />
   </head>
   <body onload="init()">
     <div id="loading" class="overlay">
@@ -21,25 +22,41 @@
         class="spinner-pokeball rotate"
       />
     </div>
-<!-- Äußeres Overlay: Klick auf den Hintergrund schließt es -->
-<div id="detailPokemon" class="detailPokemonOverlay hidden" onclick="toggleDetailPokemon()">
-  <!-- Innerer Container für die Details: Klicks hier sollen NICHT das Overlay schließen -->
-  <div id="detailContent" class="OverlaydetailDiv" onclick="event.stopPropagation()">
-  </div>
-</div>
+    <!-- Äußeres Overlay: Klick auf den Hintergrund schließt es -->
+    <div
+      id="detailPokemon"
+      class="detailPokemonOverlay hidden"
+      onclick="toggleDetailOverlay()"
 
+    >
+      <!-- Innerer Container für die Details: Klicks hier sollen NICHT das Overlay schließen -->
+      <div
+        id="detailContent"
+        class="OverlaydetailDiv"
+        onclick="event.stopPropagation()"
+      ></div>
+    </div>
 
- 
     <header>
       <img src="./assets/img/logo-header.png" alt="" />
       <input type="text" id="search" placeholder="Search for a Pokémon" />
-      <button class="btn-style glitchBtn" onclick="searchPokemon()" id="search-button">Search</button>
+      <button
+        class="btn-style glitchBtn"
+        onclick="searchPokemon()"
+        id="search-button"
+      >
+        Search
+      </button>
     </header>
     <main id="mainPart">
       <div id="allPokemons"></div>
     </main>
     <div class="loadMore">
-      <button class="btn-style glitchBtn" onclick="loadMorePokemon()" id="loadMore">
+      <button
+        class="btn-style glitchBtn"
+        onclick="loadMorePokemon()"
+        id="loadMore"
+      >
         <img
           src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
           class="btn-pokeball left"

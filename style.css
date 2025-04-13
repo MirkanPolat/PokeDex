@@ -222,3 +222,36 @@ button:hover::after {
   transform: translateY(2px);
   box-shadow: 0px 2px 0px #b71c1c;
 }
+
+.stat-row {
+  margin-bottom: 8px;
+}
+
+.stat-name {
+  font-weight: bold;
+  display: inline-block;
+  width: 100px;
+}
+
+.stat-bar {
+  background-color: #ddd;
+  border-radius: 8px;
+  height: 18px;
+  overflow: hidden;
+  display: inline-block;
+  width: 60%;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+.stat-fill {
+  background-color: #ef5350;
+  height: 100%;
+  text-align: right;
+  padding-right: 6px;
+  color: white;
+  font-size: 0.8rem;
+  line-height: 18px;
+  border-radius: 8px;
+  transition: width 0.3s ease;
+}

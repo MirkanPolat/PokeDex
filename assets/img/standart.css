@@ -200,6 +200,61 @@ main {
   box-shadow: 0px 0px 20px 0px;
 }
 
+.stat-fill.fire {
+  background-color: #f08030;
+}
+.stat-fill.water {
+  background-color: #6890f0;
+}
+.stat-fill.grass {
+  background-color: #78c850;
+}
+.stat-fill.electric {
+  background-color: #f8d030;
+}
+.stat-fill.ice {
+  background-color: #98d8d8;
+}
+.stat-fill.fighting {
+  background-color: #c03028;
+}
+.stat-fill.poison {
+  background-color: #a040a0;
+}
+.stat-fill.ground {
+  background-color: #e0c068;
+}
+.stat-fill.flying {
+  background-color: #a890f0;
+}
+.stat-fill.psychic {
+  background-color: #f85888;
+}
+.stat-fill.bug {
+  background-color: #a8b820;
+}
+.stat-fill.rock {
+  background-color: #b8a038;
+}
+.stat-fill.ghost {
+  background-color: #705898;
+}
+.stat-fill.dark {
+  background-color: #705848;
+}
+.stat-fill.dragon {
+  background-color: #7038f8;
+}
+.stat-fill.steel {
+  background-color: #b8b8d0;
+}
+.stat-fill.fairy {
+  background-color: #f0b6bc;
+}
+.stat-fill.normal {
+  background-color: #a8a878;
+}
+
 .hidden {
   display: none !important;
 }
@@ -218,11 +273,14 @@ main {
 }
 /* Innerer Container für Details */
 .overlayInner {
-  width: 100%;
+  width: calc(100% - 20px);
+  height: 658px;
   background-color: #fff;
   border-radius: 15px;
   overflow: hidden;
   position: relative;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 /* Farbiger Kopfbereich – wir könnten hier den Typ-Farbverlauf verwenden */
@@ -233,7 +291,7 @@ main {
   border-bottom: 2px solid rgba(0, 0, 0, 0.2);
 }
 
-h2{
+h2 {
   display: flex;
   justify-content: space-between;
 }
@@ -279,7 +337,7 @@ h2{
 }
 
 .overlayTabs button {
-  background: #efefef;
+  background: #967373;
   border: none;
   padding: 6px 12px;
   border-radius: 5px;
@@ -288,7 +346,7 @@ h2{
 }
 
 .overlayTabs button:hover {
-  background: #ddd;
+  background: #b08c8c;
 }
 
 /* Tab-Inhalte */
@@ -296,7 +354,35 @@ h2{
   padding: 0 16px 40px; /* Platz unten, damit der Schließen-Button nicht verdeckt */
   color: #333;
 }
-.pokeImageContainer{
+
+.pokeImageContainer {
   height: 210px;
   padding: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.4);
+  font-size: 28px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.nav-button.left {
+  left: 10px;
+}
+
+.nav-button.right {
+  right: 10px;
+}
+
+.nav-button:hover {
+  background-color: rgba(0, 0, 0, 0.7);
 }
