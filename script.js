@@ -132,6 +132,8 @@ function showPokemonDetail(id) {
   let detailContainer = document.getElementById("detailContent");
   detailContainer.innerHTML = renderPokemonDetail(selectedPokemon);
   document.getElementById("detailPokemon").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+
 }
 
 function renderPokemonDetail(pokemon) {
@@ -209,6 +211,9 @@ function showTab(tabName) {
 
 function toggleDetailOverlay() {
   document.getElementById("detailPokemon").classList.toggle("hidden");
+
+  document.body.style.overflow = "";
+
 }
 
 function navigateToPokemon(id) {

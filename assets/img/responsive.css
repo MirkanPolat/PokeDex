@@ -15,9 +15,17 @@
     font-size: 0.9rem;
   }
 }
-@media (max-width: 400px){
-    .overlayHeader img {
-        width: 85px;
-        height: 85px;
-    }
+@media (max-width: 400px) {
+  .overlayHeader img {
+    width: 85px;
+    height: 85px;
+  }
+  .overlayTabs button {
+    font-size: 16px;
+  }
+}
+@media (max-width: 342px) {
+  .overlayTabs button {
+    font-size: 14px;
+  }
 }
