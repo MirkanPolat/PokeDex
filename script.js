@@ -18,30 +18,9 @@ async function getInitialPokemons() {
     let pokemonData = await response.json();
     pokemons.push(pokemonData);
     container.innerHTML += renderPokemonCard(pokemonData);
-    renderPokemonTypes(pokemonData);
+    document.getElementById(`types${pokemonData.id}`).innerHTML += renderTypesHTML(pokemonData);
   }
   removeLoadingSpinner();
-}
-
-function renderPokemonCard(pokemon, source = "loaded") {
-  let mainType = pokemon.types[0].type.name;
-  return /*html*/`
-    <div class="card ${mainType}" onclick="showPokemonDetail(${pokemon.id})" data-name="${pokemon.name.toLowerCase()}" data-id="${pokemon.id}" data-source="${source}">
-      <div class="card_content">
-        <p>${pokemon.name.toUpperCase()}</p>
-        <p>No. ${pokemon.id}</p>
-        <p id="types${pokemon.id}">Type: </p>
-        <img loading="lazy" src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif" onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
-      </div>
-    </div>
-  `
-}
-
-function renderPokemonTypes(pokemon) {
-  let typeBox = document.getElementById(`types${pokemon.id}`);
-  pokemon.types.forEach(type => {
-    typeBox.innerHTML += `<span class="type ${type.type.name}">${type.type.name}</span>`;
-  });
 }
 
 async function loadMorePokemon() {
@@ -54,11 +33,12 @@ async function loadMorePokemon() {
     return;
   }
   for (let i = currentStartIndex; i < currentStartIndex + 25 && i <= 1025; i++) {
-    let response = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
-    let pokemonData = await response.json();
-    pokemons.push(pokemonData);
-    document.getElementById("allPokemons").innerHTML += renderPokemonCard(pokemonData);
-    renderPokemonTypes(pokemonData);
+    if (document.querySelector(`.card[data-id="${i}"]`)) continue;
+    let res = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+    let data = await res.json();
+    pokemons.push(data);
+    allPokemons.innerHTML += renderPokemonCard(data);
+    document.getElementById(`types${data.id}`).innerHTML += renderTypesHTML(data);
   }
   currentStartIndex += 25;
   removeLoadingSpinner();
@@ -84,19 +64,15 @@ async function searchPokemon() {
   let input = document.getElementById("search").value.toLowerCase().trim();
   let info = document.getElementById("searchInfo");
   info.textContent = "";
-
   if (!input) return resetSearch();
-
   let isNumber = !isNaN(input);
   if (!isNumber && input.length < 3) return info.textContent = "Mindestens 3 Buchstaben eingeben.";
-
   let found = false;
   document.querySelectorAll(".card").forEach(card => {
     let match = card.dataset.name.includes(input) || card.dataset.id.includes(input);
     card.style.display = match ? "block" : "none";
     if (match) found = true;
   });
-
   if (!found) await loadAndRenderMatch(input, info);
 }
 
@@ -108,12 +84,11 @@ function resetSearch() {
 async function loadAndRenderMatch(input, info) {
   let match = allPokemonList.find(p => p.name.includes(input) || p.url.split("/").filter(Boolean).pop() === input);
   if (!match) return info.textContent = "Pokémon nicht gefunden.";
-
   let res = await fetch(match.url);
   let data = await res.json();
   pokemons.push(data);
   document.getElementById("allPokemons").innerHTML += renderPokemonCard(data, "search");
-  renderPokemonTypes(data);
+  document.getElementById(`types${data.id}`).innerHTML += renderTypesHTML(data);
 }
 
 async function loadAllPokemonList() {
@@ -125,80 +100,40 @@ async function loadAllPokemonList() {
 function showPokemonDetail(id) {
   let selectedPokemon = pokemons.find(p => p.id == id);
   if (!selectedPokemon) return;
-
   let detailContainer = document.getElementById("detailContent");
   detailContainer.innerHTML = renderPokemonDetail(selectedPokemon);
   document.getElementById("detailPokemon").classList.remove("hidden");
   document.body.style.overflow = "hidden";
+  toggleNavButtons(id);
+}
 
+function toggleNavButtons(id) {
+  document.querySelector(".nav-button.left").style.display = id <= 1 ? "none" : "block";
+  document.querySelector(".nav-button.right").style.display = id >= 1025 ? "none" : "block";
 }
 
 function renderPokemonDetail(pokemon) {
-  let mainType = pokemon.types[0].type.name;
-  let height = pokemon.height / 10 + " m";
-  let weight = pokemon.weight / 10 + " kg";
-  let abilities = pokemon.abilities.map(a => a.ability.name).join(", ");
+  let type = pokemon.types[0].type.name;
+  let stats = getStatsHTML(pokemon, type);
+  let abilities = getAbilities(pokemon);
+  let shiny = getShinyGallery(pokemon);
+  let types = renderTypesHTML(pokemon);
+  return renderPokemonOverlayDetail(pokemon, type, stats, abilities, shiny, types);
+}
 
-  let baseStats = pokemon.stats.map(stat => {
-    return /*html*/`
-     <div class="stat-row">
-        <span class="stat-name">${stat.stat.name}</span>
-        <div class="stat-bar">
-          <div class="stat-fill ${mainType}" style="width: ${stat.base_stat / 2}%">${stat.base_stat}</div>
-        </div>
-      </div>
-    `
-  }).join("");
+function getAbilities(pokemon) {
+  return pokemon.abilities.map(a => a.ability.name).join(", ");
+}
 
+function getShinyGallery(pokemon) {
   shinySources = [
     pokemon.sprites.front_shiny,
     pokemon.sprites.back_shiny,
     pokemon.sprites.front_shiny_female,
     pokemon.sprites.back_shiny_female
   ].filter(src => src);
-
   currentShinyIndex = 0;
-
-  let shinyGallery = shinySources.length > 0 ? `
-    <div class="shiny-gallery">
-      <button class="shiny-nav" onclick="prevShiny()">←</button>
-      <img id="shinyImage" class="pokeImage" src="${shinySources[0]}" alt="Shiny ${pokemon.name}">
-      <button class="shiny-nav" onclick="nextShiny()">→</button>
-    </div>
-  ` : '<p>Keine Shiny-Bilder vorhanden</p>';
-
-  return `
-    <div class="overlayInner ${mainType}">
-      <div class="overlayHeader ${mainType}">
-        <h2>${pokemon.name.toUpperCase()} <span class="idTag">No. ${pokemon.id}</span></h2>
-        <div class="typeRow">
-          ${pokemon.types.map(type => `<span class="type ${type.type.name}">${type.type.name}</span>`).join(" ")}
-        </div>
-        <div class="pokeImageContainer">
-          <button class="nav-button left" onclick="navigateToPokemon(${pokemon.id - 1})">←</button>
-          <img loading="lazy" src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif" onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'" height="140" width="140">
-          <button class="nav-button right" onclick="navigateToPokemon(${pokemon.id + 1})">→</button>
-        </div>
-      </div>
-      <div class="overlayTabs">
-        <button onclick="showTab('about')">About</button>
-        <button onclick="showTab('stats')">Base Stats</button>
-        <button onclick="showTab('shiny')">Shiny</button>
-      </div>
-      <div class="overlayTabContent" id="tab-about">
-        <p><b>Height:</b> ${height}</p>
-        <p><b>Weight:</b> ${weight}</p>
-        <p><b>Abilities:</b> ${abilities}</p>
-      </div>
-      <div class="overlayTabContent" id="tab-stats" style="display:none">
-        ${baseStats}
-      </div>
-      <div class="overlayTabContent" id="tab-shiny" style="display:none">
-        ${shinyGallery}
-      </div>
-      <button class="closeBtn" onclick="toggleDetailOverlay()">Close</button>
-    </div>
-  `;
+  return renderShinyGallery(shinySources, pokemon);
 }
 
 function showTab(tabName) {
@@ -208,9 +143,7 @@ function showTab(tabName) {
 
 function toggleDetailOverlay() {
   document.getElementById("detailPokemon").classList.toggle("hidden");
-
   document.body.style.overflow = "";
-
 }
 
 function navigateToPokemon(id) {
@@ -220,12 +153,12 @@ function navigateToPokemon(id) {
     showPokemonDetail(id);
   } else {
     fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         pokemons.push(data);
         showPokemonDetail(data.id);
       })
-      .catch(error => console.error("Navigation fehlgeschlagen", error));
+      .catch(e => console.error("Fehler beim Laden", e));
   }
 }
 
