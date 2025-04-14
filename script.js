@@ -61,20 +61,22 @@ function liveSearch() {
 }
 
 async function searchPokemon() {
-  let input = document.getElementById("search").value.toLowerCase().trim();
-  let info = document.getElementById("searchInfo");
+  let input = search.value.toLowerCase().trim();
+  let info = searchInfo, found = false;
+  loadMore.style.display = input ? "none" : "flex";
+  hideImg.classList.toggle("buttonImg", !input);
   info.textContent = "";
   if (!input) return resetSearch();
-  let isNumber = !isNaN(input);
-  if (!isNumber && input.length < 3) return info.textContent = "Mindestens 3 Buchstaben eingeben.";
-  let found = false;
-  document.querySelectorAll(".card").forEach(card => {
-    let match = card.dataset.name.includes(input) || card.dataset.id.includes(input);
-    card.style.display = match ? "block" : "none";
+  if (isNaN(input) && input.length < 3)
+    return info.textContent = "Mindestens 3 Buchstaben eingeben.";
+  document.querySelectorAll(".card").forEach(c => {
+    let match = c.dataset.name.includes(input) || c.dataset.id.includes(input);
+    c.style.display = match ? "block" : "none";
     if (match) found = true;
   });
   if (!found) await loadAndRenderMatch(input, info);
 }
+
 
 function resetSearch() {
   document.querySelectorAll(".card[data-source='loaded']").forEach(c => c.style.display = "block");
@@ -82,14 +84,19 @@ function resetSearch() {
 }
 
 async function loadAndRenderMatch(input, info) {
-  let match = allPokemonList.find(p => p.name.includes(input) || p.url.split("/").filter(Boolean).pop() === input);
-  if (!match) return info.textContent = "Pokémon nicht gefunden.";
+  let match = allPokemonList.find(p => p.name === input) || 
+  allPokemonList.find(p => p.name.includes(input) || p.url.split("/").filter(Boolean).pop() === input);
+  if (!match) {
+    info.textContent = "Pokémon nicht gefunden.";
+    return;
+  }
   let res = await fetch(match.url);
   let data = await res.json();
   pokemons.push(data);
   document.getElementById("allPokemons").innerHTML += renderPokemonCard(data, "search");
   document.getElementById(`types${data.id}`).innerHTML += renderTypesHTML(data);
 }
+
 
 async function loadAllPokemonList() {
   let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
