@@ -81,43 +81,40 @@ function liveSearch() {
 }
 
 async function searchPokemon() {
-  let searchInput = document.getElementById("search").value.toLowerCase().trim();
-  let infoBox = document.getElementById("searchInfo");
-  infoBox.textContent = "";
+  let input = document.getElementById("search").value.toLowerCase().trim();
+  let info = document.getElementById("searchInfo");
+  info.textContent = "";
 
-  if (!searchInput) {
-    document.querySelectorAll(".card[data-source='loaded']").forEach(card => card.style.display = "block");
-    document.querySelectorAll(".card[data-source='search']").forEach(card => card.remove());
-    return;
-  }
+  if (!input) return resetSearch();
 
-  if (searchInput.length < 3) {
-    infoBox.textContent = "Bitte mindestens 3 Buchstaben eingeben.";
-    return;
-  }
-  let foundMatch = false;
+  let isNumber = !isNaN(input);
+  if (!isNumber && input.length < 3) return info.textContent = "Mindestens 3 Buchstaben eingeben.";
+
+  let found = false;
   document.querySelectorAll(".card").forEach(card => {
-    let name = card.dataset.name;
-    let id = card.dataset.id;
-    let isMatch = name.includes(searchInput) || id.includes(searchInput);
-    card.style.display = isMatch ? "block" : "none";
-    if (isMatch) foundMatch = true;
+    let match = card.dataset.name.includes(input) || card.dataset.id.includes(input);
+    card.style.display = match ? "block" : "none";
+    if (match) found = true;
   });
 
-  if (!foundMatch) {
-    let matchedPokemon = allPokemonList.find(p => p.name.toLowerCase().includes(searchInput));
-    if (matchedPokemon) {
-      let response = await fetch(matchedPokemon.url);
-      let pokemonData = await response.json();
-      pokemons.push(pokemonData);
-      document.getElementById("allPokemons").innerHTML += renderPokemonCard(pokemonData, "search");
-      renderPokemonTypes(pokemonData);
-    } else {
-      infoBox.textContent = "Pokémon nicht gefunden.";
-    }
-  }
+  if (!found) await loadAndRenderMatch(input, info);
 }
 
+function resetSearch() {
+  document.querySelectorAll(".card[data-source='loaded']").forEach(c => c.style.display = "block");
+  document.querySelectorAll(".card[data-source='search']").forEach(c => c.remove());
+}
+
+async function loadAndRenderMatch(input, info) {
+  let match = allPokemonList.find(p => p.name.includes(input) || p.url.split("/").filter(Boolean).pop() === input);
+  if (!match) return info.textContent = "Pokémon nicht gefunden.";
+
+  let res = await fetch(match.url);
+  let data = await res.json();
+  pokemons.push(data);
+  document.getElementById("allPokemons").innerHTML += renderPokemonCard(data, "search");
+  renderPokemonTypes(data);
+}
 
 async function loadAllPokemonList() {
   let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");

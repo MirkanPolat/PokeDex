@@ -3,13 +3,6 @@ body {
   color: whitesmoke;
 }
 
-html.no-scroll,
-body.no-scroll {
-  overflow: hidden;
-  height: 100%;
-}
-
-
 header {
   background-color: #333;
   color: white;
