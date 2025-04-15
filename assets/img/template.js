@@ -4,18 +4,23 @@ function renderTypesHTML(pokemon) {
   
 function renderPokemonCard(pokemon, source = "loaded") {
     let mainType = pokemon.types[0].type.name;
+    let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+    let star = favs.includes(pokemon.id) ? "★" : "☆";
+  
     return /*html*/`
       <div class="card ${mainType}" onclick="showPokemonDetail(${pokemon.id})" data-name="${pokemon.name.toLowerCase()}" data-id="${pokemon.id}" data-source="${source}">
+      <div class="fav-star" onclick="toggleFavorite(event, ${pokemon.id}, this)">${star}</div>
         <div class="card_content">
           <p>${pokemon.name.toUpperCase()}</p>
           <p>No. ${pokemon.id}</p>
           <p id="types${pokemon.id}">Type: </p>
-          <img loading="lazy" src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif" onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
+          <img loading="lazy" src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif"
+            onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'">
         </div>
-      </div>
-    `;
-}
+      </div>`;
 
+  }
+  
 function renderPokemonOverlayDetail(pokemon, type, stats, abilities, shiny, types) {
 return /*html*/`
 <div class="overlayInner ${type}">

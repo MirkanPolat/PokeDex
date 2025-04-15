@@ -3,6 +3,7 @@ let pokemons = [];
 let allPokemonList = [];
 let shinySources = [];
 let currentShinyIndex = 0;
+let showOnlyFavorites = false;
 
 function init() {
   liveSearch();
@@ -19,6 +20,7 @@ async function getInitialPokemons() {
     pokemons.push(pokemonData);
     container.innerHTML += renderPokemonCard(pokemonData);
     document.getElementById(`types${pokemonData.id}`).innerHTML += renderTypesHTML(pokemonData);
+    checkFavoriteStatus();
   }
   removeLoadingSpinner();
 }
@@ -39,6 +41,7 @@ async function loadMorePokemon() {
     pokemons.push(data);
     allPokemons.innerHTML += renderPokemonCard(data);
     document.getElementById(`types${data.id}`).innerHTML += renderTypesHTML(data);
+    checkFavoriteStatus();
   }
   currentStartIndex += 25;
   removeLoadingSpinner();
@@ -77,7 +80,6 @@ async function searchPokemon() {
   if (!found) await loadAndRenderMatch(input, info);
 }
 
-
 function resetSearch() {
   document.querySelectorAll(".card[data-source='loaded']").forEach(c => c.style.display = "block");
   document.querySelectorAll(".card[data-source='search']").forEach(c => c.remove());
@@ -85,7 +87,7 @@ function resetSearch() {
 
 async function loadAndRenderMatch(input, info) {
   let match = allPokemonList.find(p => p.name === input) || 
-  allPokemonList.find(p => p.name.includes(input) || p.url.split("/").filter(Boolean).pop() === input);
+    allPokemonList.find(p => p.name.includes(input) || p.url.split("/").filter(Boolean).pop() === input);
   if (!match) {
     info.textContent = "Pokémon nicht gefunden.";
     return;
@@ -96,7 +98,6 @@ async function loadAndRenderMatch(input, info) {
   document.getElementById("allPokemons").innerHTML += renderPokemonCard(data, "search");
   document.getElementById(`types${data.id}`).innerHTML += renderTypesHTML(data);
 }
-
 
 async function loadAllPokemonList() {
   let response = await fetch("https://pokeapi.co/api/v2/pokemon?limit=10000");
@@ -169,14 +170,64 @@ function navigateToPokemon(id) {
   }
 }
 
-function prevShiny() {
+function changeShiny(step) {
   if (shinySources.length === 0) return;
-  currentShinyIndex = (currentShinyIndex - 1 + shinySources.length) % shinySources.length;
+  currentShinyIndex = (currentShinyIndex + step + shinySources.length) % shinySources.length;
   document.getElementById("shinyImage").src = shinySources[currentShinyIndex];
 }
 
-function nextShiny() {
-  if (shinySources.length === 0) return;
-  currentShinyIndex = (currentShinyIndex + 1) % shinySources.length;
-  document.getElementById("shinyImage").src = shinySources[currentShinyIndex];
+function prevShiny() { changeShiny(-1); }
+function nextShiny() { changeShiny(1); }
+
+function toggleFavorites() {
+  search.value = "";
+  showOnlyFavorites = !showOnlyFavorites;
+  let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+  document.querySelectorAll(".card").forEach(card => {
+    let id = +card.dataset.id;
+    card.style.display = showOnlyFavorites ? (favs.includes(id) ? "block" : "none") : "block";
+  });
+  let btn = document.getElementById("search-button");
+  btn.textContent = showOnlyFavorites ? "🔁 Show all" : "⭐ Favorites";
+  document.getElementById("resetFavoritesContainer").style.display = showOnlyFavorites ? "block" : "none";
+}
+
+function toggleFavorite(event, id, starElement) {
+  event.stopPropagation();
+  let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+  if (favs.includes(id)) {
+    favs = favs.filter(f => f !== id);
+    starElement.textContent = "☆";
+  } else {
+    favs.push(id);
+    starElement.textContent = "★";
+  }
+  localStorage.setItem("favorites", JSON.stringify(favs));
+}
+
+function resetFavorites() {
+  showOnlyFavorites = false;
+  document.querySelectorAll(".card").forEach(card => {
+    card.style.display = "block";
+  });
+  document.getElementById("search-button").textContent = "⭐ Favorites";
+  document.getElementById("resetFavoritesContainer").style.display = "none";
+}
+
+function resetAllFavorites() {
+  localStorage.removeItem("favorites");
+  document.querySelectorAll(".fav-star").forEach(star => star.textContent = "☆");
+  document.querySelectorAll(".card").forEach(card => card.style.display = "block");
+  showOnlyFavorites = false;
+  document.getElementById("search-button").textContent = "⭐ Favoriten anzeigen";
+  document.getElementById("resetFavoritesContainer").style.display = "none";
+}
+
+function checkFavoriteStatus() {
+  let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+  document.querySelectorAll(".card").forEach(card => {
+    let id = +card.dataset.id;
+    let star = card.querySelector(".fav-star");
+    if (star) star.textContent = favs.includes(id) ? "★" : "☆";
+  });
 }

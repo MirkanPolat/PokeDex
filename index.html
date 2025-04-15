@@ -28,7 +28,6 @@
       id="detailPokemon"
       class="detailPokemonOverlay hidden"
       onclick="toggleDetailOverlay()"
-
     >
       <!-- Innerer Container für die Details: Klicks hier sollen NICHT das Overlay schließen -->
       <div
@@ -41,13 +40,18 @@
     <header>
       <img src="./assets/img/logo-header.png" alt="" />
       <input type="text" id="search" placeholder="Search for a Pokémon" />
+<div class="favDiv" >
+      <div id="resetFavoritesContainer" style="text-align:center; margin-top:20px; display:none;">
+        <button class="btn-style glitchBtn" onclick="resetAllFavorites()">♻️ Reset all </button>
+      </div>
       <p id="searchInfo" class="info-text"></p>
       <button
         class="btn-style glitchBtn"
-        onclick="searchPokemon()"
+        onclick="toggleFavorites()"
         id="search-button">
-        Search
+        ⭐ Favorites
       </button>
+</div>
     </header>
     <main id="mainPart">
       <div id="allPokemons"></div>

@@ -277,3 +277,13 @@ button:hover::after {
   text-align: center;
   margin-top: 5px;
 }
+.fav-star {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 22px;
+  color: gold;
+  cursor: pointer;
+  user-select: none;
+  z-index: 10;
+}
