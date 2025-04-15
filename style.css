@@ -64,12 +64,10 @@
   box-shadow: 0px 8px 0px #b71c1c;
 }
 
-/* Pokéball Animation beim Hover */
 #loadMore:hover .btn-pokeball {
   transform: rotate(360deg);
 }
 
-/* Klick Effekt */
 #loadMore:active {
   transform: translateY(2px);
   box-shadow: 0px 2px 0px #b71c1c;
@@ -231,12 +229,10 @@ button:hover::after {
   margin-bottom: 8px;
 }
 
-
 .stat-name {
   flex-shrink: 0;
-  width: 100px; /* Oder max-width */
+  width: 100px;
 }
-
 
 .stat-bar {
   flex: 1;
@@ -248,7 +244,6 @@ button:hover::after {
   vertical-align: middle;
 }
 
-
 .stat-fill {
   background-color: #ef5350;
   height: 100%;
@@ -259,9 +254,8 @@ button:hover::after {
   line-height: 18px;
   border-radius: 8px;
   transition: width 1s ease-in-out;
-  width: 0; /* Startzustand für Animation */
+  width: 0;
 }
-
 
 .shiny-gallery {
   display: flex;

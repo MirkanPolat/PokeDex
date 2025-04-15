@@ -7,29 +7,23 @@
     <link
       rel="shortcut icon"
       href="./assets/img/logo-header.png"
-      type="image/x-icon"
-    />
+      type="image/x-icon">
     <script src="./assets/img/template.js"></script>
     <script src="script.js"></script>
     <link rel="stylesheet" href="./assets/img/standart.css" />
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="./assets/img/responsive.css" />
   </head>
   <body onload="init()">
     <div id="loading" class="overlay">
       <img
         src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
         alt="Loading..."
-        class="spinner-pokeball rotate"
-      />
+        class="spinner-pokeball rotate">
     </div>
-    <!-- Äußeres Overlay: Klick auf den Hintergrund schließt es -->
     <div
       id="detailPokemon"
       class="detailPokemonOverlay hidden"
-      onclick="toggleDetailOverlay()"
-    >
-      <!-- Innerer Container für die Details: Klicks hier sollen NICHT das Overlay schließen -->
+      onclick="toggleDetailOverlay()">
       <div
         id="detailContent"
         class="OverlaydetailDiv"
@@ -40,37 +34,37 @@
     <header>
       <img src="./assets/img/logo-header.png" alt="" />
       <input type="text" id="search" placeholder="Search for a Pokémon" />
-<div class="favDiv" >
-      <div id="resetFavoritesContainer" style="text-align:center; margin-top:20px; display:none;">
-        <button class="btn-style glitchBtn" onclick="resetAllFavorites()">♻️ Reset all </button>
+      <div class="favDiv">
+        <div
+          id="resetFavoritesContainer"
+          style="text-align: center; display: none">
+          <button class="btn-style glitchBtn" onclick="resetAllFavorites()">♻️ Reset all
+          </button>
+        </div>
+        <p id="searchInfo" class="info-text"></p>
+        <button
+          class="btn-style glitchBtn"
+          onclick="toggleFavorites()"
+          id="search-button">
+          ⭐ Favorites
+        </button>
       </div>
-      <p id="searchInfo" class="info-text"></p>
-      <button
-        class="btn-style glitchBtn"
-        onclick="toggleFavorites()"
-        id="search-button">
-        ⭐ Favorites
-      </button>
-</div>
     </header>
     <main id="mainPart">
       <div id="allPokemons"></div>
     </main>
-    <div class="loadMore">
+    <div class="loadMore favDiv">
       <button
         class="btn-style glitchBtn"
         onclick="loadMorePokemon()"
-        id="loadMore"
-      >
+        id="loadMore">
         <img
           src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
-          class="btn-pokeball left"
-        />
+          class="btn-pokeball left">
         Load More
         <img
           src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
-          class="btn-pokeball right"
-        />
+          class="btn-pokeball right">
       </button>
       <div>
         <img
@@ -78,8 +72,7 @@
           class="buttonImg"
           src="./assets/img/logo-header.png"
           width="122px"
-          alt=""
-        />
+          alt="">
       </div>
     </div>
   </body>

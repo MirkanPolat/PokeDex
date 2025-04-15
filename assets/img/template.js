@@ -28,11 +28,11 @@ return /*html*/`
         <h2>${pokemon.name.toUpperCase()} <span class="idTag">No. ${pokemon.id}</span></h2>
         <div class="typeRow">${types}</div>
         <div class="pokeImageContainer">
-        <button class="nav-button left" onclick="navigateToPokemon(${pokemon.id - 1})">←</button>
+        <button class="nav-button left" onclick="navigateDetail(-1, ${pokemon.id})">←</button>
         <img loading="lazy" src="https://play.pokemonshowdown.com/sprites/ani/${pokemon.name}.gif"
-                onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'"
-                height="140" width="140">
-            <button class="nav-button right" onclick="navigateToPokemon(${pokemon.id + 1})">→</button>
+        onerror="this.onerror=null; this.src='${pokemon.sprites.other['official-artwork'].front_default}'"
+        height="140" width="140">
+        <button class="nav-button right" onclick="navigateDetail(1, ${pokemon.id})">→</button>
         </div>
     </div>
   

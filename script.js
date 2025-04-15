@@ -65,7 +65,7 @@ async function searchPokemon() {
   info.textContent = "";
   if (!input) return resetSearch();
   if (isNaN(input) && input.length < 3)
-    return info.textContent = "Mindestens 3 Buchstaben eingeben.";
+    return info.textContent = "At least 3 letters";
   document.querySelectorAll(".card").forEach(c => {
     let match = c.dataset.name.includes(input) || c.dataset.id.includes(input);
     c.style.display = match ? "block" : "none";
@@ -83,7 +83,7 @@ async function loadAndRenderMatch(input, info) {
   let match = allPokemonList.find(p => p.name === input) || 
     allPokemonList.find(p => p.name.includes(input) || p.url.split("/").filter(Boolean).pop() === input);
   if (!match) {
-    info.textContent = "Pokémon nicht gefunden.";
+    info.textContent = "Pokémon not found";
     return;
   }
   let res = await fetch(match.url);
@@ -115,10 +115,25 @@ function animateStats() {
   });
 }
 
-
 function toggleNavButtons(id) {
-  document.querySelector(".nav-button.left").style.display = id <= 1 ? "none" : "block";
-  document.querySelector(".nav-button.right").style.display = id >= 1025 ? "none" : "block";
+  if (showOnlyFavorites) {
+    let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+    favs.sort((a, b) => a - b);
+    let currentIndex = favs.indexOf(id);
+    if (currentIndex === 0) {
+      document.querySelector(".nav-button.left").style.display = "none";
+    } else {
+      document.querySelector(".nav-button.left").style.display = "block";
+    }
+    if (currentIndex === favs.length - 1) {
+      document.querySelector(".nav-button.right").style.display = "none";
+    } else {
+      document.querySelector(".nav-button.right").style.display = "block";
+    }
+  } else {
+    document.querySelector(".nav-button.left").style.display = id <= 1 ? "none" : "block";
+    document.querySelector(".nav-button.right").style.display = id >= 1025 ? "none" : "block";
+  }
 }
 
 function renderPokemonDetail(pokemon) {
@@ -174,6 +189,21 @@ function navigateToPokemon(id) {
   }
 }
 
+function navigateDetail(direction, currentId) {
+  if (showOnlyFavorites) {
+    let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+    favs.sort((a, b) => a - b);
+    let currentIndex = favs.indexOf(currentId);
+    if (currentIndex === -1) return;
+    let newIndex = currentIndex + direction;
+    if (newIndex < 0 || newIndex >= favs.length) return;
+    let newId = favs[newIndex];
+    showPokemonDetail(newId);
+  } else {
+    navigateToPokemon(currentId + direction);
+  }
+}
+
 function changeShiny(step) {
   if (shinySources.length === 0) return;
   currentShinyIndex = (currentShinyIndex + step + shinySources.length) % shinySources.length;
@@ -194,7 +224,20 @@ function toggleFavorites() {
   let btn = document.getElementById("search-button");
   btn.textContent = showOnlyFavorites ? "🔁 Show all" : "⭐ Favorites";
   document.getElementById("resetFavoritesContainer").style.display = showOnlyFavorites ? "block" : "none";
+
+  // Hier fügst Du den Code hinzu, der den Load More-Button ausblendet und das Bild einblendet:
+  if (showOnlyFavorites) {
+    document.getElementById("loadMore").style.display = "none";
+    // Entferne die "buttonImg"-Klasse, damit das Bild sichtbar wird
+    document.getElementById("hideImg").classList.remove("buttonImg");
+  } else {
+    // Zeige den Load More-Button wieder an
+    document.getElementById("loadMore").style.display = "flex";
+    // Füge die "buttonImg"-Klasse wieder hinzu, damit das Bild ausgeblendet wird
+    document.getElementById("hideImg").classList.add("buttonImg");
+  }
 }
+
 
 function toggleFavorite(event, id, starElement) {
   event.stopPropagation();
@@ -223,8 +266,10 @@ function resetAllFavorites() {
   document.querySelectorAll(".fav-star").forEach(star => star.textContent = "☆");
   document.querySelectorAll(".card").forEach(card => card.style.display = "block");
   showOnlyFavorites = false;
-  document.getElementById("search-button").textContent = "⭐ Favoriten anzeigen";
+  document.getElementById("search-button").textContent = "⭐ Favorites";
   document.getElementById("resetFavoritesContainer").style.display = "none";
+  document.getElementById("loadMore").style.display = "flex";
+  document.getElementById("hideImg").classList.add("buttonImg");
 }
 
 function checkFavoriteStatus() {
