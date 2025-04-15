@@ -351,10 +351,11 @@ h2 {
   background: #b08c8c;
 }
 
-/* Tab-Inhalte */
 .overlayTabContent {
-  padding: 0 16px 40px; /* Platz unten, damit der Schließen-Button nicht verdeckt */
+  padding: 0 16px 40px; 
   color: #333;
+  display: block;
+  height: 150px;
 }
 
 .pokeImageContainer {
@@ -389,7 +390,7 @@ h2 {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-.favDiv{
+.favDiv {
   display: flex;
   align-items: end;
   gap: 8px;

@@ -27,13 +27,7 @@ async function getInitialPokemons() {
 
 async function loadMorePokemon() {
   showLoadingSpinner();
-  if (currentStartIndex > 1025) {
-    document.getElementById("loadMore").style.display = "none";
-    toggleFinalImage();
-    alert("No more Pokémon to load.");
-    removeLoadingSpinner();
-    return;
-  }
+  noMoreToLoad();
   for (let i = currentStartIndex; i < currentStartIndex + 25 && i <= 1025; i++) {
     if (document.querySelector(`.card[data-id="${i}"]`)) continue;
     let res = await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
@@ -115,6 +109,13 @@ function showPokemonDetail(id) {
   toggleNavButtons(id);
 }
 
+function animateStats() {
+  document.querySelectorAll('.stat-fill').forEach(bar => {
+    bar.style.width = bar.dataset.width;
+  });
+}
+
+
 function toggleNavButtons(id) {
   document.querySelector(".nav-button.left").style.display = id <= 1 ? "none" : "block";
   document.querySelector(".nav-button.right").style.display = id >= 1025 ? "none" : "block";
@@ -147,6 +148,9 @@ function getShinyGallery(pokemon) {
 function showTab(tabName) {
   document.querySelectorAll(".overlayTabContent").forEach(tab => tab.style.display = "none");
   document.getElementById(`tab-${tabName}`).style.display = "block";
+  if (tabName === 'stats') {
+    setTimeout(animateStats, 50);
+  }
 }
 
 function toggleDetailOverlay() {

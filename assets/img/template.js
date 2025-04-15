@@ -61,7 +61,7 @@ function getStatsHTML(pokemon, type) {
         <div class="stat-row">
             <span class="stat-name">${stat.stat.name}</span>
             <div class="stat-bar">
-                <div class="stat-fill ${type}" style="width: ${stat.base_stat / 2}%">${stat.base_stat}</div>
+            <div class="stat-fill ${type}" data-width="${stat.base_stat / 2}%" style="width: 0">${stat.base_stat}</div>
             </div>
         </div>`
     }).join("");
@@ -78,4 +78,14 @@ function renderShinyGallery(shinySources, pokemon){
       <button class="shiny-nav" onclick="nextShiny()">→</button>
     </div>`
     }
+}
+
+function noMoreToLoad(){
+if (currentStartIndex > 1025) {
+    document.getElementById("loadMore").style.display = "none";
+    toggleFinalImage();
+    alert("No more Pokémon to load.");
+    removeLoadingSpinner();
+    return;
+}
 }
